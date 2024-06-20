@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+
+    <item android:id="@+id/nav_home"
+        android:icon="@drawable/ic_vector_home"
+        android:title="@string/dashboard"/>
+
+    <item android:id="@+id/nav_projects"
+        android:icon="@drawable/ic_vector_project"
+        android:title="@string/projects"/>
+
+    <item android:id="@+id/nav_add"
+        android:icon="@drawable/ic_vector_add"
+        android:title="@string/new_project"/>
+    </group>
+
+    <item android:title="Other">
+
+        <menu>
+            <group>
+            <item android:id="@+id/nav_setting"
+                android:title="@string/setting"/>
+
+            <item android:id="@+id/nav_signout"
+                android:title="@string/sign_out"/>
+            </group>
+        </menu>
+    </item>
+
+</menu>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="colorPrimary">#105E21</color>
+    <color name="colorSecondary">#0F2D53</color>
+    <color name="colorAccent">#FE460D</color>
+
+
+    <color name="green_bg">#33105E21</color>
+    <color name="blue_bg">#330F2D53</color>
+    <color name="blue_light">#700F2D53</color>
+    <color name="grey">#7a7875</color>
+    <color name="darkblue">#1A237E</color>
+    <color name="dark_pink">#c51162</color>
+    <color name="text_color_secondary">#7a7875</color>
+    <color name="light_gray">#D3D2D2</color>
+    <color name="text_color_primary">#424242</color>
+    <color name="purple">#a854d4</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="dark_blue">#3871c1</color>
+    <color name="blue">#3d5afe</color>
+    <color name="green">#4dd0e1</color>
+    <color name="gray">#f5f5f5</color>
+    <color name="light_green">#10c853</color>
+    <color name="transparent">#2000</color>
+    <color name="error_color">#B90A0A</color>
+    <color name="pink">#f06292</color>
+    <color name="dark_purple">#9c27b0</color>
+    <color name="red">#e53935</color>
+    <color name="light_pink">#ffcdd2</color>
+    <color name="light_orange">#fff3e0</color>
+    <color name="orange">#F19505</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="amazon_brown">#CBAA72</color>
+    <color name="flipkart_blue">#286FE8</color>
+    <color name="flipkart_yellow">#F2D52D</color>
+
+    <color name="blue_30">#8F1A237E</color>
+    <color name="color_green_light">#8F105E21</color>
+    <color name="color_red_light">#8FE53935</color>
+</resources>

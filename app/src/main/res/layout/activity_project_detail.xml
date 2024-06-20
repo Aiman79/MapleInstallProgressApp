@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".project.activity.ProjectDetailActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/toolbar_detail" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="@dimen/xxlarge_text"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="1dp"
+                        android:text="%"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="@dimen/xlarge_text"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/tv_progress"
+                        app:layout_constraintStart_toEndOf="@id/tv_progress"
+                        app:layout_constraintTop_toTopOf="@id/tv_progress" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/custom_progress_bg"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_progress" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_calendar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:src="@drawable/ic_vector_calendar"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/progress_bar" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_start_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/rect_blue_bg"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text=""
+                        app:layout_constraintBottom_toBottomOf="@id/iv_calendar"
+                        app:layout_constraintEnd_toStartOf="@id/tv_dash"
+                        app:layout_constraintStart_toEndOf="@id/iv_calendar"
+                        app:layout_constraintTop_toTopOf="@id/iv_calendar" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_dash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:gravity="center"
+                        android:padding="8dp"
+                        android:text="-"
+                        android:textSize="@dimen/large_text"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_calendar"
+                        app:layout_constraintEnd_toStartOf="@id/tv_end_date"
+                        app:layout_constraintStart_toEndOf="@id/tv_start_date"
+                        app:layout_constraintTop_toTopOf="@id/iv_calendar" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_end_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:background="@drawable/rect_blue_bg"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text=""
+                        app:layout_constraintBottom_toBottomOf="@id/iv_calendar"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/tv_dash"
+                        app:layout_constraintTop_toTopOf="@id/iv_calendar" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_clock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:src="@drawable/ic_vector_clock"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/iv_calendar" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_title_days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/days_left"
+                        android:textColor="@color/text_color_primary"
+                        android:textSize="@dimen/medium_text"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_clock"
+                        app:layout_constraintStart_toEndOf="@id/iv_clock"
+                        app:layout_constraintTop_toTopOf="@id/iv_clock" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_days"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text=""
+                        android:textColor="@color/colorAccent"
+                        android:textSize="@dimen/normal_text"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_clock"
+                        app:layout_constraintStart_toEndOf="@id/tv_title_days"
+                        app:layout_constraintTop_toTopOf="@id/iv_clock" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/ic_vector_target"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/iv_clock" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_title_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/target"
+                        android:textColor="@color/text_color_primary"
+                        android:textSize="@dimen/medium_text"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_target"
+                        app:layout_constraintStart_toEndOf="@id/iv_target"
+                        app:layout_constraintTop_toTopOf="@id/iv_target" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text=""
+                        android:textColor="@color/text_color_primary"
+                        android:textSize="@dimen/normal_text"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_target"
+                        app:layout_constraintStart_toEndOf="@id/tv_title_target"
+                        app:layout_constraintTop_toTopOf="@id/iv_target" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_day"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/day"
+                        android:textColor="@color/text_color_primary"
+                        android:textSize="@dimen/normal_text"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_target"
+                        app:layout_constraintStart_toEndOf="@id/tv_target"
+                        app:layout_constraintTop_toTopOf="@id/iv_target" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:src="@drawable/ic_vector_detail"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/iv_target" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/et_description"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/rext_orange_border"
+                        android:gravity="start"
+                        android:hint="@string/description"
+                        android:minLines="5"
+                        android:padding="7dp"
+                        android:textColor="@color/text_color_primary"
+                        android:textSize="@dimen/medium_text"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/iv_description"
+                        app:layout_constraintTop_toTopOf="@id/iv_description" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:padding="5dp"
+                app:cardCornerRadius="5dp"
+                app:cardElevation="4dp"
+                app:layout_constraintTop_toBottomOf="@id/card_details">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="20dp">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_task_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tasks"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="@dimen/large_text"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/tv_no_tasks"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center"
+                        android:text="@string/please_create_a_task"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_task_title" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_tasks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_task_title" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_add_tasks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rect_green"
+            android:drawableStart="@drawable/ic_vector_add_white"
+            android:drawablePadding="5dp"
+            android:elevation="20dp"
+            android:paddingStart="15dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="5dp"
+            android:text="@string/add_new_task"
+            android:textColor="@color/white" />
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

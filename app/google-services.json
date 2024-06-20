@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "751843361696",
+    "firebase_url": "https://maple-install-s-progress-default-rtdb.firebaseio.com",
+    "project_id": "maple-install-s-progress",
+    "storage_bucket": "maple-install-s-progress.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751843361696:android:c4bab484bdb4ff2ce0dac5",
+        "android_client_info": {
+          "package_name": "com.rktechnohub.sugarbashprogressapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "751843361696-fhah46f1kg3gjdaonua0b63i9cfosnl5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rktechnohub.sugarbashprogressapp",
+            "certificate_hash": "51753cc02d3425fd882232e3c90c28e4c278b34e"
+          }
+        },
+        {
+          "client_id": "751843361696-0qi74fh7kq7c12d0pn147cc8ipkh1gvk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwOomHvLodo35-O4hKQO9ic3DifIR1J0Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "751843361696-0qi74fh7kq7c12d0pn147cc8ipkh1gvk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

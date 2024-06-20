@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".map.activity.MapEditActivity">
+
+    <include layout="@layout/toolbar_map"
+        android:id="@+id/toolbar"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/cl_icons"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:background="@drawable/rect_blue_borrder"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/straight_line"
+            android:id="@+id/redLine"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:id="@+id/tv_yellow_line"
+            android:text="- - - - - - - - -"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/yellow"
+            app:layout_constraintTop_toBottomOf="@id/redLine"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/straight_line"
+            android:tint="@color/colorSecondary"
+            android:id="@+id/blueLine"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintTop_toBottomOf="@id/tv_yellow_line"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/straight_line"
+            android:tint="@color/orange"
+            android:id="@+id/orangeLine"
+            android:layout_marginTop="10dp"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            app:layout_constraintTop_toBottomOf="@id/blueLine"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iv_star"
+            android:tint="@color/yellow"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_vector_star"
+            app:layout_constraintTop_toTopOf="@id/iv_rect"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/iv_rect"
+            app:layout_constraintEnd_toStartOf="@id/iv_rect"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_rect"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="15dp"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:src="@drawable/rect_blue_light"
+            app:layout_constraintTop_toBottomOf="@id/orangeLine"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintEnd_toStartOf="@id/iv_circle"/>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/iv_circle"
+            android:padding="7dp"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp"
+            android:src="@drawable/circle_red"
+            app:layout_constraintTop_toTopOf="@id/iv_rect"
+            app:layout_constraintBottom_toBottomOf="@id/iv_rect"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.rktechnohub.sugarbashprogressapp.map.models.DrawingImageView
+        android:id="@+id/iv_draw"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cl_icons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_upload"
+        android:text="@string/upload_map"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:background="@drawable/rect_green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

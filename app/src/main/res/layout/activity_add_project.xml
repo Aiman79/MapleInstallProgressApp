@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".project.activity.AddProjectActivity">
+
+    <include layout="@layout/toolbar_back"
+        android:id="@+id/toolbar"/>
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/type_project_name_here"
+        android:padding="8dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:textSize="@dimen/normal_text"
+        android:background="@drawable/rext_orange_border"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/et_emoji"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/please_add_emoji_for_your_project_icon"
+        android:padding="8dp"
+        android:maxLength="1"
+        android:maxLines="1"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="20dp"
+        android:textSize="@dimen/normal_text"
+        android:background="@drawable/rext_orange_border"
+        app:layout_constraintEnd_toStartOf="@id/iv_edit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_name" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/iv_edit"
+        android:src="@drawable/ic_vector_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@id/et_emoji"
+        app:layout_constraintTop_toTopOf="@id/et_emoji"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_or"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Or Add Image"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_emoji" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/ic_vector_add"
+        android:background="@drawable/rect_blue_borrder"
+        android:textColor="@color/colorSecondary"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_or" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next"
+        android:background="@color/colorSecondary"
+        android:textColor="@color/white"
+        android:padding="10dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_image" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

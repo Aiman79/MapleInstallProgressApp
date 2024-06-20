@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".project.activity.AssignProjectActivity">
+
+    <include layout="@layout/toolbar_back"
+        android:id="@+id/toolbar"/>
+
+   <androidx.cardview.widget.CardView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:layout_constraintTop_toBottomOf="@id/toolbar"
+       android:layout_marginTop="20dp"
+       android:id="@+id/cl_role"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:cardCornerRadius="4dp"
+       app:cardElevation="4dp"
+       android:layout_marginStart="20dp"
+       android:layout_marginEnd="20dp">
+
+       <RadioGroup
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/rg_roles"
+           app:layout_constraintTop_toBottomOf="@id/toolbar"
+           app:layout_constraintStart_toStartOf="parent"
+           android:layout_marginStart="20dp"
+           android:layout_marginTop="20dp">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_admin"
+                android:text="@string/admin"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_employee"
+                android:text="@string/employee"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_client"
+                android:text="@string/client"/>
+       </RadioGroup>
+   </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cl_role"
+        android:layout_marginTop="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rv_users"
+            android:layout_margin="10dp"/>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>
