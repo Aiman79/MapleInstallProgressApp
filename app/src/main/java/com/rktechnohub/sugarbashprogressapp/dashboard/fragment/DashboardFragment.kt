@@ -1,5 +1,6 @@
 package com.rktechnohub.sugarbashprogressapp.dashboard.fragment
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -31,6 +32,7 @@ import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModelFactory
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import com.rktechnohub.sugarbashprogressapp.utils.ColorCustomizeClass.updateProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -182,12 +184,19 @@ class DashboardFragment : Fragment() {
                 }
             }
             totalTasks = items.size
-            (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this))
+            (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this), requireContext())
             tvTotalTasks.text = "$completedTasks of $totalTasks"
 
            try{
                tvProgress.text = "${(progress / totalTasks)}%"
-               progressBar.progress = progress / totalTasks
+//               progressBar.progress = progress / totalTasks
+               progressBar.updateProgress(progress / totalTasks, requireContext())
+               //animator
+               val animator = ObjectAnimator.ofInt(progressBar, "progress",
+                   0, progressBar.progress)
+               animator.duration = 500 // 2 seconds
+               animator.start()
+
            } catch (e: Exception){
                e.printStackTrace()
            }

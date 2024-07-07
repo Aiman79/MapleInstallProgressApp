@@ -87,4 +87,7 @@
     <string name="client">Client</string>
     <string name="edit_map">Edit Map</string>
     <string name="upload_map">Upload Map</string>
+    <string name="add_new_project">Add New Project</string>
+    <string name="color_customize">Color Customize</string>
+    <string name="done">Done</string>
 </resources>

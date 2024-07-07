@@ -1,5 +1,6 @@
 package com.rktechnohub.sugarbashprogressapp.task.adapter
 
+import android.content.Context
 import android.icu.text.Transliterator.Position
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import com.rktechnohub.sugarbashprogressapp.R
 import com.rktechnohub.sugarbashprogressapp.project.model.Project
 import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import com.rktechnohub.sugarbashprogressapp.utils.ColorCustomizeClass.updateProgress
 
 /**
  * Created by Aiman on 18, May, 2024
@@ -18,11 +20,13 @@ import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
 class TasksAdapter(private var mList :MutableList<TaskModel>) : RecyclerView.Adapter<TaskViewHolder>(){
 //    private var mList = mutableListOf<ProjectModel>()
     private var requestManager: RequestManager? = null
+    var context: Context? = null
 
-    fun setData(list: MutableList<TaskModel>, requestManager: RequestManager) {
+    fun setData(list: MutableList<TaskModel>, requestManager: RequestManager, context: Context) {
         mList = list
         this.requestManager = requestManager
         Log.d("ProjectAdapter", "setData called with list of size ${list.size}")
+        this.context = context
 
         this.notifyDataSetChanged()
     }
@@ -39,7 +43,8 @@ class TasksAdapter(private var mList :MutableList<TaskModel>) : RecyclerView.Ada
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         holder.tvName.text = mList[position].name
         holder.tvProgress.text = "${mList[position].progress}%"
-        holder.progressBar.progress = mList[position].progress.toInt()
+//        holder.progressBar.progress = mList[position].progress.toInt()
+        holder.progressBar.updateProgress(mList[position].progress.toInt(), context!!)
 
         if (mList[position].taskId.isNullOrEmpty()){
             holder.tvSubTasks.text = "0 of 0 subtasks"

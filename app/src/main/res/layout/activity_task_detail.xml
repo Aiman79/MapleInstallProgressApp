@@ -38,16 +38,38 @@
                     android:layout_marginEnd="10dp"
                     android:layout_marginBottom="20dp">
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/cl_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_task_name"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_task_name">
+
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_task_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="🎂"
+                        android:visibility="gone"
                         android:textColor="@color/colorSecondary"
                         android:textSize="@dimen/xxlarge_text"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_task_icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/ic_vector_clock"
+                        android:textColor="@color/colorSecondary"
+                        android:textSize="@dimen/xxlarge_text"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/tv_task_name"
@@ -58,8 +80,8 @@
                         android:textColor="@color/colorSecondary"
                         android:textSize="@dimen/xxlarge_text"
                         android:textStyle="bold"
-                        app:layout_constraintStart_toEndOf="@id/tv_task_icon"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintStart_toEndOf="@id/cl_icon"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/cl_progress"

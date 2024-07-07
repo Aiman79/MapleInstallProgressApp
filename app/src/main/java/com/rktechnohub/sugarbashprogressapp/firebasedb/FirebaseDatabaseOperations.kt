@@ -137,10 +137,11 @@ class FirebaseDatabaseOperations {
      * ****************************************************************
      */
 
-    fun addProject(project: Project) {
+    fun addProject(project: Project): Project {
         val newRef = getProjectTableRef().push()
         project.id = newRef.key!!
         newRef.setValue(project)
+        return project
     }
 
     fun updateProject(project: Project) {
@@ -150,25 +151,63 @@ class FirebaseDatabaseOperations {
 
     suspend fun deleteProject(project: Project, callback: () -> Unit) {
         if (project.taskId.isNotEmpty()) {
-            val taskIds = project.taskId.split(",")
-            for (id in taskIds){
-                deleteTask(getTaskByTaskIdCoroutine(id)) {
+            if (project.taskId.contains(",")){
+                val taskIds = project.taskId.split(",")
+                for (id in taskIds){
+                    deleteTask(getTaskByTaskIdCoroutine(id)){
+                        val database = FirebaseDatabase.getInstance()
+                        val ref = database.getReference("${DBReferences.projectTableName}/${project.id}")
 
+                        ref.removeValue().addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("Firebase", "Item deleted successfully")
+                                deleteDataListener?.success()
+                                callback()
+                            } else {
+                                Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                                deleteDataListener?.failed()
+                            }
+                        }
+                    }
+                }
+            } else {
+                   try {
+                       deleteTask(getTaskByTaskIdCoroutine(project.taskId)){
+                           val database = FirebaseDatabase.getInstance()
+                           val ref = database.getReference("${DBReferences.projectTableName}/${project.id}")
+
+                           ref.removeValue().addOnCompleteListener { task ->
+                               if (task.isSuccessful) {
+                                   Log.d("Firebase", "Item deleted successfully")
+                                   deleteDataListener?.success()
+                                   callback()
+                               } else {
+                                   Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                                   deleteDataListener?.failed()
+                               }
+                           }
+                       }
+                   } catch (e: Exception){
+
+                   }
+            }
+
+        } else {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference("${DBReferences.projectTableName}/${project.id}")
+
+            ref.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "Item deleted successfully")
+                    deleteDataListener?.success()
+                    callback()
+                } else {
+                    Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                    deleteDataListener?.failed()
                 }
             }
         }
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("${DBReferences.projectTableName}/${project.id}")
 
-        ref.removeValue().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("Firebase", "Item deleted successfully")
-                deleteDataListener?.success()
-            } else {
-                Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
-                deleteDataListener?.failed()
-            }
-        }
     }
 
     //TODO only once called
@@ -179,7 +218,7 @@ class FirebaseDatabaseOperations {
                 dataSnapshot.children.forEachIndexed { _, itemSnapshot ->
                     val itemId = itemSnapshot.key
                     val itemData = itemSnapshot.getValue<Map<String, Any>>()?.toMutableMap()
-                    itemData!![DBReferences.order] = ""// add new field
+                    itemData!![DBReferences.oldMapLink] = ""// add new field
                     ref.child(itemId!!).updateChildren(itemData)
                 }
             }
@@ -404,6 +443,13 @@ class FirebaseDatabaseOperations {
     }
 
 
+    suspend fun deleteImageFromFirebaseStorage(link: String) {
+        return withContext(Dispatchers.IO) {
+            val storageReference = FirebaseStorage.getInstance().reference
+                .storage.getReferenceFromUrl(link)
+            storageReference.delete().await()
+        }
+    }
     suspend fun uploadBitmapToFirebaseStorage(bitmap: Bitmap): Uri? {
         return withContext(Dispatchers.IO) {
             val storageRef = FirebaseStorage.getInstance().reference
@@ -433,6 +479,68 @@ class FirebaseDatabaseOperations {
         return unorderedProjects + sortedList
     }
 
+    suspend fun copyProject(project: Project, orderList: List<OrderClass>): Project{
+       try{
+           var nProject = Project(
+               "", project.name + "-Copy", project.icon, AppUtils.getCurrentDate(), "", "", "","",
+               project.taskId,  project.adminId, project.employeeId,project.clientId, "0", "", "", ""
+           )
+           nProject = addProject(nProject)
+           val taskList = getTaskByProjectIdCoroutine(project.id, true, orderList)
+           val taskIDs: MutableList<String> = mutableListOf()
+           for (task in taskList){
+//               var nTask = task
+               var nTask = TaskModel("", task.name + "-Copy", task.icon,
+                   "", task.id, "", "0", task.userId,
+                   nProject.id, "0", "", "")
+               nTask = addTask(nTask)
+               val subTaskIDs: MutableList<String> = mutableListOf()
+               if (task.taskId.isNotEmpty()){
+                   val subTasks: MutableList<TaskModel> = mutableListOf()
+                   if (task.taskId.contains(",")){
+                       val ids = task.taskId.split(",")
+                       for (id in ids){
+                           val subTask = getTaskByTaskIdCoroutine(id)
+//                           var nSubTask = subTask
+                           var nSubTask = TaskModel("", subTask.name + "-Copy", subTask.icon,
+                               "", "", nTask.id, "0", subTask.userId,
+                               nProject.id, "0", "", "")
+                           nSubTask = addTask(nSubTask)
+                           subTaskIDs.add(nSubTask.id)
+                           subTasks.add(nSubTask)
+                       }
+                   } else {
+                       val subTask = getTaskByTaskIdCoroutine(task.taskId)
+                       var nSubTask = TaskModel("", subTask.name + "-Copy", subTask.icon,
+                           "", "", nTask.id, "0", subTask.userId,
+                           nProject.id, "0", "", "")
+                       nSubTask = addTask(nSubTask)
+                       subTaskIDs.add(nSubTask.id)
+                       subTasks.add(nSubTask)
+                   }
+
+
+//                   task.id = nTask.id
+
+                   nTask.taskId = subTaskIDs.joinToString (", ")
+                   updateTask(nTask)
+                   taskIDs.add(nTask.id)
+                   nTask.subTaskList = subTasks
+               }
+           }
+           return withContext(Dispatchers.IO) {
+               suspendCancellableCoroutine { continuation ->
+                   nProject.taskId = taskIDs.joinToString (", ")
+                   nProject.taskList.addAll(taskList)
+                   updateProject(nProject)
+                   continuation.resume(nProject)
+               }
+           }
+       } catch (e: Exception){
+           return project
+       }
+    }
+
 
     /**
      * ****************************************************************
@@ -440,10 +548,11 @@ class FirebaseDatabaseOperations {
      * ****************************************************************
      */
 
-    fun addTask(task: TaskModel) {
+    fun addTask(task: TaskModel): TaskModel {
         val newRef = getTaskTableRef().push()
         task.id = newRef.key!!
         newRef.setValue(task)
+        return task
     }
 
     fun updateTask(task: TaskModel) {
@@ -453,23 +562,86 @@ class FirebaseDatabaseOperations {
 
     suspend fun deleteTask(tasks: TaskModel, callback: () -> Unit) {
         if (tasks.taskId.isNotEmpty()) {
-            deleteSubTasks(tasks) {
-                callback()
-            }
-        }
-        val database = FirebaseDatabase.getInstance()
-        val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
+            try {
+                deleteSubTasks(tasks) {
+                    val database = FirebaseDatabase.getInstance()
+                    val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
 
-        ref.removeValue().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("Firebase", "Item deleted successfully")
-                deleteDataListener?.success()
-            } else {
-                Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
-                deleteDataListener?.failed()
+                    ref.removeValue().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("Firebase", "Item deleted successfully")
+                            deleteDataListener?.success()
+                            callback()
+                        } else {
+                            Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                            deleteDataListener?.failed()
+                        }
+                    }
+                }
+            } catch (e: Exception){
+                val database = FirebaseDatabase.getInstance()
+                val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
+
+                ref.removeValue().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("Firebase", "Item deleted successfully")
+                        deleteDataListener?.success()
+                        callback()
+                    } else {
+                        Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                        deleteDataListener?.failed()
+                    }
+                }
+            }
+        } else {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
+
+            ref.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "Item deleted successfully")
+                    deleteDataListener?.success()
+                    callback()
+                } else {
+                    Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                    deleteDataListener?.failed()
+                }
             }
         }
+
     }
+
+    /*suspend fun deleteTask(tasks: TaskModel) = suspendCancellableCoroutine<Unit> { continuation ->
+        if (tasks.taskId.isNotEmpty()) {
+            deleteSubTasks(tasks) {
+                val database = FirebaseDatabase.getInstance()
+                val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
+
+                ref.removeValue().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("Firebase", "Item deleted successfully")
+                        continuation.resume(Unit)
+                    } else {
+                        Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                        continuation.resumeWithException(task.exception!!)
+                    }
+                }
+            }
+        } else {
+            val database = FirebaseDatabase.getInstance()
+            val ref = database.getReference("${DBReferences.taskTableName}/${tasks.id}")
+
+            ref.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("Firebase", "Item deleted successfully")
+                    continuation.resume(Unit)
+                } else {
+                    Log.d("Firebase", "Error deleting item: ${task.exception?.message}")
+                    continuation.resumeWithException(task.exception!!)
+                }
+            }
+        }
+    }*/
 
     suspend fun deleteSubTasks(task: TaskModel, callback: () -> Unit) = coroutineScope {
         val taskIds = task.taskId.split(",")
@@ -766,6 +938,7 @@ class FirebaseDatabaseOperations {
         const val taskId = "taskId"
         const val deadline_date = "deadline_date"
         const val mapLink = "mapLink"
+        const val oldMapLink = "oldMapLink"
         const val order = "order"
     }
 
@@ -813,6 +986,7 @@ class FirebaseDatabaseOperations {
             map["clientId"] as String,
             map["progress"] as String,
             map["mapLink"] as String,
+            map["oldMapLink"] as String,
             map["order"] as String,
         )
     }

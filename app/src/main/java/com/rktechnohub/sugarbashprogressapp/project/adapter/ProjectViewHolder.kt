@@ -17,6 +17,7 @@ class ProjectViewHolder(view: View): RecyclerView.ViewHolder(view) {
     var ivIcon: AppCompatImageView
     var ivMap: AppCompatImageView
     var ivDelete: AppCompatImageView
+    var ivCopy: AppCompatImageView
     var tvDate: AppCompatTextView
     var tvProgress: AppCompatTextView
     var progressBar: ProgressBar
@@ -28,6 +29,7 @@ class ProjectViewHolder(view: View): RecyclerView.ViewHolder(view) {
         tvDate = view.findViewById(R.id.tv_date)
         ivMap = view.findViewById(R.id.iv_map)
         ivDelete = view.findViewById(R.id.iv_delete)
+        ivCopy = view.findViewById(R.id.iv_copy)
         tvProgress = view.findViewById(R.id.tv_progress)
         progressBar = view.findViewById(R.id.progress_bar)
         clMain = view.findViewById(R.id.cl_main)

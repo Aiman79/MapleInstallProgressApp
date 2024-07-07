@@ -1,18 +1,26 @@
 package com.rktechnohub.sugarbashprogressapp.project.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.NestedScrollView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.rktechnohub.sugarbashprogressapp.R
+import com.rktechnohub.sugarbashprogressapp.authentication.model.SessionManager
 import com.rktechnohub.sugarbashprogressapp.dashboard.fragment.DashboardFragment
+import com.rktechnohub.sugarbashprogressapp.project.activity.AddProjectActivity
 import com.rktechnohub.sugarbashprogressapp.project.adapter.ViewPagerAdapter
+import com.rktechnohub.sugarbashprogressapp.task.activity.AddTaskActivity
+import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,6 +40,8 @@ class ProjectFragment : Fragment() {
     private var view: View? = null
     private lateinit var pager: ViewPager2// creating object of ViewPager
     private lateinit var tab: TabLayout  // creating object of TabLayout
+    private lateinit var btnAddProject: AppCompatButton
+    private lateinit var nestedScrollView: NestedScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,29 +65,95 @@ class ProjectFragment : Fragment() {
     private fun registerViews(){
         pager = view?.findViewById(R.id.viewPager)!!
         tab = view?.findViewById(R.id.tabs)!!
+        btnAddProject = view?.findViewById(R.id.btn_add_project)!!
+        nestedScrollView = view?.findViewById(R.id.nested_scrollview)!!
+
+        val session = SessionManager(requireContext())
+        val role = session.getRole()
+        if (role == AppUtils.roleAdmin.toString() || role == AppUtils.roleSuperAdmin.toString()){
+            btnAddProject.visibility = View.VISIBLE
+        } else {
+            btnAddProject.visibility = View.GONE
+        }
+
+        btnAddProject.setOnClickListener {
+            val intent = Intent(requireContext(), AddProjectActivity::class.java)
+            startActivity(intent)
+        }
+
+        nestedScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (scrollY > oldScrollY) { // scrolling down
+                animateButton(false) // hide text
+            } else if (scrollY < oldScrollY) { // scrolling up
+                animateButton(true) // show text
+            }
+        }
+    }
+
+    private fun animateButton(showText: Boolean) {
+        btnAddProject.animate()
+            .setDuration(200) // animation duration
+            .scaleX(if (showText) 1f else 0.9f) // adjust the scale to show/hide text
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                if (!showText) {
+                    btnAddProject.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_vector_add_white,
+                        0, 0, 0)
+                    btnAddProject.text = ""
+                } else {
+                    btnAddProject.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_vector_add_white,
+                        0, 0, 0)
+                    btnAddProject.text = resources.getString(R.string.add_new_task)
+                }
+            }
     }
 
     private fun setUpPager(){
         val adapter = ViewPagerAdapter(childFragmentManager, lifecycle)
 
         // add fragment to the list
-        adapter.addFragment(ProjectListFragment())
-        adapter.addFragment(TasksListFragment())
-        adapter.addFragment(DashboardFragment())
 
-        // Adding the Adapter to the ViewPager
-        pager.adapter = adapter
 
         // bind the viewPager with the TabLayout.
-        TabLayoutMediator(tab, pager) { tab, position ->
-//            tab.text = "object ${(position + 1)}".lowercase()
-            tab.text = when (position) {
-                0 -> "Projects"
-                1 -> "Tasks"
-                else -> "Today"
-            }.lowercase()
+        val session = SessionManager(requireContext())
+        if (session.getRole() == AppUtils.roleSuperAdmin.toString()){
+            adapter.addFragment(ProjectListFragment.newInstance(false))
+            adapter.addFragment(ProjectListFragment.newInstance(true))
+            adapter.addFragment(TasksListFragment())
+            adapter.addFragment(DashboardFragment())
 
-        }.attach()
+            // Adding the Adapter to the ViewPager
+            pager.adapter = adapter
+
+            TabLayoutMediator(tab, pager) { tab, position ->
+//            tab.text = "object ${(position + 1)}".lowercase()
+                tab.text = when (position) {
+                    0 -> "Projects"
+                    1 -> "Maple's Install"
+                    2 -> "Tasks"
+                    else -> "Today"
+                }.lowercase()
+
+            }.attach()
+        } else {
+            adapter.addFragment(ProjectListFragment())
+            adapter.addFragment(TasksListFragment())
+            adapter.addFragment(DashboardFragment())
+
+            // Adding the Adapter to the ViewPager
+            pager.adapter = adapter
+
+            TabLayoutMediator(tab, pager) { tab, position ->
+//            tab.text = "object ${(position + 1)}".lowercase()
+                tab.text = when (position) {
+                    0 -> "Projects"
+                    1 -> "Tasks"
+                    else -> "Today"
+                }.lowercase()
+
+            }.attach()
+        }
+
     }
 
     companion object {

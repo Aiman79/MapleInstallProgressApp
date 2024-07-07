@@ -2,6 +2,7 @@ package com.rktechnohub.sugarbashprogressapp.project.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import java.io.Serializable
 
 /**
@@ -22,7 +23,9 @@ class Project : Parcelable{
     var clientId: String
     var progress: String
     var mapLink: String
+    var oldMapLink: String
     var order: String
+    var taskList: MutableList<TaskModel>
 
     init {
         this.id = ""
@@ -39,7 +42,9 @@ class Project : Parcelable{
         this.clientId = ""
         this.progress = ""
         this.mapLink = ""
+        this.oldMapLink = ""
         this.order = ""
+        this.taskList = mutableListOf()
     }
 
     constructor(){
@@ -55,10 +60,12 @@ class Project : Parcelable{
         this.adminId = ""
         this.employeeId = ""
         this.mapLink = ""
+        this.oldMapLink = ""
         this.order = ""
     }
 
     constructor(parcel: Parcel) : this(
+        parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
         parcel.readString()!!,
@@ -90,6 +97,7 @@ class Project : Parcelable{
                   clientId: String,
                   progress: String,
                   mapLink: String,
+                  oldMapLink: String,
                   order: String,
         ){
         this.id = id
@@ -106,6 +114,7 @@ class Project : Parcelable{
         this.clientId = clientId
         this.progress = progress
         this.mapLink = mapLink
+        this.oldMapLink = oldMapLink
         this.order = order
     }
 
@@ -147,6 +156,7 @@ class Project : Parcelable{
         parcel.writeString(clientId)
         parcel.writeString(progress)
         parcel.writeString(mapLink)
+        parcel.writeString(oldMapLink)
         parcel.writeString(order)
     }
 

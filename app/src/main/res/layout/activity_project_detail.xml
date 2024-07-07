@@ -7,17 +7,21 @@
     android:layout_height="match_parent"
     tools:context=".project.activity.ProjectDetailActivity">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar_detail" />
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scrollview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:paddingBottom="30dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar_detail" />
+            android:layout_height="match_parent"
+            android:paddingBottom="30dp">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_details"
@@ -28,7 +32,7 @@
                 android:layout_marginEnd="20dp"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="4dp"
-                app:layout_constraintTop_toBottomOf="@id/toolbar">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -243,8 +247,10 @@
                 android:layout_marginEnd="20dp"
                 android:layout_marginBottom="20dp"
                 android:padding="5dp"
+                android:paddingBottom="30dp"
                 app:cardCornerRadius="5dp"
                 app:cardElevation="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/card_details">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -272,49 +278,97 @@
                         android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="@string/please_create_a_task"
+                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_task_title" />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_tasks"
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:visibility="gone"
+                        android:visibility="visible"
+                        android:id="@+id/cl_total_tasks"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_task_title" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_task_title">
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_title_task"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/today_s_task"
+                            android:textColor="@color/colorSecondary"
+                            android:textSize="@dimen/normal_text"
+                            android:textStyle="normal"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/tv_completed_task"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:background="@drawable/rect_blue_borrder"
+                            android:drawableStart="@drawable/ic_vector_done"
+                            android:drawablePadding="5dp"
+                            android:paddingStart="13dp"
+                            android:paddingEnd="13dp"
+                            android:text="1 of 3"
+                            android:textColor="@color/colorSecondary"
+                            android:textSize="@dimen/normal_text"
+                            android:textStyle="normal"
+                            app:layout_constraintBottom_toBottomOf="@id/tv_title_task"
+                            app:layout_constraintStart_toEndOf="@id/tv_title_task"
+                            app:layout_constraintTop_toTopOf="@id/tv_title_task" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_tasks"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:visibility="visible"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/tv_completed_task" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_add_tasks"
+    <!--  <androidx.cardview.widget.CardView
+          android:id="@+id/card_add_tasks"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="20dp"
+          android:layout_marginTop="20dp"
+          android:layout_marginEnd="20dp"
+          android:layout_marginBottom="20dp"
+          app:cardCornerRadius="5dp"
+          app:cardElevation="4dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent">-->
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_add_task"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
+        android:background="@drawable/rect_green"
+        android:drawableStart="@drawable/ic_vector_add_white"
+        android:elevation="20dp"
+        android:minWidth="0dp"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:text="@string/add_new_task"
+        android:textColor="@color/white"
         app:cardCornerRadius="5dp"
-        app:cardElevation="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_add_task"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rect_green"
-            android:drawableStart="@drawable/ic_vector_add_white"
-            android:drawablePadding="5dp"
-            android:elevation="20dp"
-            android:paddingStart="15dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="15dp"
-            android:paddingBottom="5dp"
-            android:text="@string/add_new_task"
-            android:textColor="@color/white" />
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintEnd_toEndOf="parent" />
+    <!--    </androidx.cardview.widget.CardView>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -269,21 +269,21 @@ class AddProjectActivity : AppCompatActivity() {
                     project = Project(
                         "", name, icon, AppUtils.getCurrentDate(), "", "",
                         "", "", "", session.getUId(), "", "",
-                        "0", "", ""
+                        "0", "", "", ""
                     )
                 }
 
                 AppUtils.roleSuperAdmin.toString() -> {
                     project = Project(
-                        "", name, icon, AppUtils.getCurrentDate(), "", "", "",
-                        "", "", session.getUId(), "", "", "0", "", ""
+                        "", name, icon, AppUtils.getCurrentDate(), "", "", "","",
+                        "",  session.getUId(), "","", "0", "", "", ""
                     )
                 }
 
                 else -> {
                     project = Project(
-                        "", name, icon, AppUtils.getCurrentDate(), "", "", "",
-                        "", "", "", "", "", "0", "", ""
+                        "", name, icon, AppUtils.getCurrentDate(), "", "", "", "",
+                        "", "", "", "", "0", "", "", ""
                     )
                 }
             }

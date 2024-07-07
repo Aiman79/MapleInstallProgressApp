@@ -171,7 +171,7 @@ class TasksListFragment : Fragment() {
                 rvTasks.visibility = View.VISIBLE
                 tvNoTasks.visibility = View.GONE
 //                totalTasks = items.size
-                (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this))
+                (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this), requireContext())
             }
         })
     }

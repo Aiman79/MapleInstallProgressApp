@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".setting.activity.CustomColorActivity">
+
+    <include layout="@layout/toolbar_back"
+        android:id="@+id/toolbar"/>
+
+    <ProgressBar
+        android:id="@+id/progress_op_1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:progress="30"
+        android:progressDrawable="@drawable/custom_progress_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_percentage"
+        android:text="0 - 49 %"
+        android:textColor="@color/colorSecondary"
+        android:textSize="@dimen/large_text"
+        app:layout_constraintTop_toTopOf="@id/progress_op_1"
+        app:layout_constraintStart_toEndOf="@id/progress_op_1"
+        app:layout_constraintEnd_toStartOf="@+id/iv_op_1"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_1"
+        android:layout_marginStart="20dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/iv_op_1"
+        android:background="@color/colorAccent"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/progress_op_1"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_1"/>
+
+
+    <ProgressBar
+        android:id="@+id/progress_op_2"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:progress="65"
+        android:progressDrawable="@drawable/custom_progress_bg_blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_op_1" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_percentage_op_2"
+        android:text="50 - 99 %"
+        android:textColor="@color/colorSecondary"
+        android:textSize="@dimen/large_text"
+        app:layout_constraintTop_toTopOf="@id/progress_op_2"
+        app:layout_constraintStart_toEndOf="@id/progress_op_2"
+        app:layout_constraintEnd_toStartOf="@+id/iv_op_2"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_2"
+        android:layout_marginStart="20dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/iv_op_2"
+        android:background="@color/colorSecondary"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/progress_op_2"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_2"/>
+
+    <ProgressBar
+        android:id="@+id/progress_op_3"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:progress="100"
+        android:progressDrawable="@drawable/custom_progress_bg_green"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_op_2" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_percentage_op_3"
+        android:text="100 %"
+        android:textColor="@color/colorSecondary"
+        android:textSize="@dimen/large_text"
+        app:layout_constraintTop_toTopOf="@id/progress_op_3"
+        app:layout_constraintStart_toEndOf="@id/progress_op_3"
+        app:layout_constraintEnd_toStartOf="@+id/iv_op_3"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_3"
+        android:layout_marginStart="20dp"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/iv_op_3"
+        android:background="@color/colorPrimary"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/progress_op_3"
+        app:layout_constraintBottom_toBottomOf="@id/progress_op_3"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_done"
+        android:text="@string/done"
+        android:background="@drawable/rect_green"
+        android:textColor="@color/white"
+        android:layout_marginTop="80dp"
+        app:layout_constraintTop_toBottomOf="@+id/progress_op_3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

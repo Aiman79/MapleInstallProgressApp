@@ -78,6 +78,8 @@ class AssignProjectActivity : AppCompatActivity() {
         if (intent != null && intent.extras != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 projectModel = intent.extras!!.getParcelable("data", Project::class.java)
+            } else {
+                projectModel = intent.extras!!.getParcelable("data")
             }
         }
     }

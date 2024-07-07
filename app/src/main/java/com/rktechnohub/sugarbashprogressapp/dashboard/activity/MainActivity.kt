@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.rktechnohub.sugarbashprogressapp.R
 import com.rktechnohub.sugarbashprogressapp.authentication.activity.RoleActivity
@@ -26,6 +27,7 @@ import com.rktechnohub.sugarbashprogressapp.authentication.model.SessionManager
 import com.rktechnohub.sugarbashprogressapp.dashboard.fragment.DashboardFragment
 import com.rktechnohub.sugarbashprogressapp.project.activity.AddProjectActivity
 import com.rktechnohub.sugarbashprogressapp.project.fragment.ProjectFragment
+import com.rktechnohub.sugarbashprogressapp.setting.freagment.SettingFragment
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     //nav fields
     lateinit var tvName: AppCompatTextView
     lateinit var tvEmail: AppCompatTextView
+    lateinit var tvRole: AppCompatTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         window.statusBarColor = ContextCompat.getColor(this, R.color.white)
         registerViews()
+        checkIfUserIsDisabled()
         init()
     }
 
@@ -111,11 +115,18 @@ class MainActivity : AppCompatActivity() {
         navView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             tvName = navView.getHeaderView(0).findViewById(R.id.tv_name)
             tvEmail = navView.getHeaderView(0).findViewById(R.id.tv_email)
+            tvRole = navView.getHeaderView(0).findViewById(R.id.tv_role)
 //            tvName = navView.findViewById(R.id.tv_name)
 //            tvEmail = navView.findViewById(R.id.tv_email)
             val session = SessionManager(this)
             tvName.text = session.getName()
             tvEmail.text = session.getEmail()
+            tvRole.text = when(session.getRole()){
+                AppUtils.roleSuperAdmin.toString() -> "Super Admin"
+                AppUtils.roleEmployee.toString() -> "Employee"
+                AppUtils.roleClient.toString() -> "Client"
+                else -> "Admin"
+            }
         }
 
         setSupportActionBar(toolbar);
@@ -151,9 +162,12 @@ class MainActivity : AppCompatActivity() {
                     val intent = Intent(this, AddProjectActivity::class.java)
                     startActivity(intent)
                 }
-                R.id.nav_setting -> Toast.makeText(this, "Setting", Toast.LENGTH_SHORT).show()
+                R.id.nav_setting -> {
+                    replaceFragment(SettingFragment(), "Setting")
+                }
                 R.id.nav_signout -> {
                     Firebase.auth.signOut()
+                    FirebaseAuth.getInstance().signOut()
                     val sessionManager = SessionManager(this)
                     sessionManager.logout()
                     Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
@@ -188,5 +202,40 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun checkIfUserIsDisabled() {
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
+        currentUser?.reload()?.addOnCompleteListener{
+            if (it.isSuccessful){
+                if (currentUser == null){
+                    logOutUser()
+                }
+            }
+        }
+        /*auth.currentUser?.reload()
+
+        auth.(uid).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val user = task.result
+                if (user.disabled) {
+                    // User is disabled, log out and revoke access
+                    logOutUser()
+                } else {
+                    // User is enabled, allow access
+                }
+            } else {
+                // Error fetching user data
+            }
+        }*/
+    }
+
+    fun logOutUser() {
+        val auth = FirebaseAuth.getInstance()
+        auth.signOut()
+        // Remove user data from SharedPreferences
+        val sharedPreferences = getSharedPreferences("user_data", MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply()
     }
 }

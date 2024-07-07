@@ -1,5 +1,6 @@
 package com.rktechnohub.sugarbashprogressapp.task.activity
 
+import android.animation.ObjectAnimator
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -47,6 +48,7 @@ import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModelFactory
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import com.rktechnohub.sugarbashprogressapp.utils.ColorCustomizeClass.updateProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,6 +75,7 @@ class TaskDetailActivity : AppCompatActivity() {
     private lateinit var tvTaskIcon: AppCompatTextView
     private lateinit var ivBack: AppCompatImageView
     private lateinit var tvIcon: AppCompatTextView
+    private lateinit var ivIcon: AppCompatImageView
     private lateinit var tvProject: AppCompatTextView
     private lateinit var tvDate: AppCompatTextView
     private lateinit var tvTime: AppCompatTextView
@@ -82,6 +85,7 @@ class TaskDetailActivity : AppCompatActivity() {
     private lateinit var ivAssign: AppCompatImageView
     private lateinit var ivMinus: AppCompatImageView
     private lateinit var ivPlus: AppCompatImageView
+    private lateinit var ivEdit: AppCompatImageView
 
     private var role = ""
 
@@ -119,10 +123,12 @@ class TaskDetailActivity : AppCompatActivity() {
         ivAssign = findViewById(R.id.iv_assign)
         ivPlus = findViewById(R.id.iv_plus)
         ivMinus = findViewById(R.id.iv_minus)
+        ivEdit = findViewById(R.id.iv_edit)
         tvTaskName = findViewById(R.id.tv_task_name)
         tvTaskIcon = findViewById(R.id.tv_task_icon)
         ivBack = findViewById(R.id.iv_back)
         tvIcon = findViewById(R.id.tv_icon)
+        ivIcon = findViewById(R.id.iv_task_icon)
         tvDate = findViewById(R.id.tv_date)
         tvTime = findViewById(R.id.tv_time)
         tvProject = findViewById(R.id.tv_project)
@@ -167,9 +173,22 @@ class TaskDetailActivity : AppCompatActivity() {
 
         tvTitle.visibility = View.GONE
         tvTaskName.text = taskModel?.name
-        tvTaskIcon.text = taskModel?.icon
         tvIcon.text = projectModel?.icon
         tvProject.text = projectModel?.name
+
+        val isEmoji = AppUtils.checkIfEmoji(taskModel?.icon!!)
+        if (isEmoji) {
+            tvTaskIcon.visibility = View.VISIBLE
+            ivIcon.visibility = View.GONE
+            tvTaskIcon.text = taskModel?.icon!!
+        } else {
+            tvTaskIcon.visibility = View.GONE
+            ivIcon.visibility = View.VISIBLE
+            Glide.with(this).load(taskModel?.icon!!)
+                .skipMemoryCache(true)
+                .into(ivIcon)
+        }
+
         try {
             tvDescription.text = taskModel?.description!!
         } catch (e: Exception) {
@@ -187,12 +206,13 @@ class TaskDetailActivity : AppCompatActivity() {
     }
 
     private fun addListeners(role: String) {
-        ivBack.setOnClickListener { finish() }
+        ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        tvDescription.setOnClickListener {
+            showDescriptionDialog()
+        }
 
         if (role != AppUtils.roleClient.toString()){
-            tvDescription.setOnClickListener {
-                showDescriptionDialog()
-            }
 
             tvDate.setOnClickListener { showCalendar() }
 
@@ -222,6 +242,10 @@ class TaskDetailActivity : AppCompatActivity() {
                 tvProgress.text = seekBar.progress.toString()
             }
         }
+
+        ivEdit.setOnClickListener {
+            showRenameDialog()
+        }
     }
 
     private fun setProgressLayout(role: String) {
@@ -235,6 +259,12 @@ class TaskDetailActivity : AppCompatActivity() {
 
             seekBar.max = 100
             try {
+                //animator
+                val animator = ObjectAnimator.ofInt(seekBar, "progress",
+                    0, taskModel?.progress?.toInt()!!)
+                animator.duration =500 // 2 seconds
+                animator.start()
+
                 seekBar.progress = taskModel?.progress?.toInt()!!
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -265,6 +295,11 @@ class TaskDetailActivity : AppCompatActivity() {
             tvProgress.text = taskModel?.progress
 
             try {
+                //animator
+                val animator = ObjectAnimator.ofInt(progressBar, "progress",
+                    0, taskModel?.progress?.toInt()!!)
+                animator.duration = 500 // 2 seconds
+                animator.start()
                 progressBar.setProgress(taskModel?.progress?.toInt()!!, true)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -330,7 +365,7 @@ class TaskDetailActivity : AppCompatActivity() {
              } else {
                  rvTasks.visibility = View.VISIBLE
                  tvNoTasks.visibility = View.GONE*/
-            (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this))
+            (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this), this)
 //            }
         })
     }
@@ -395,7 +430,7 @@ class TaskDetailActivity : AppCompatActivity() {
 //        input1.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.rext_orange_border))
         input1.inputType = InputType.TYPE_CLASS_TEXT
         input1.hint = "Please Enter description"
-
+        input1.setText(taskModel?.description)
 
         layout.addView(input1)
 
@@ -409,6 +444,46 @@ class TaskDetailActivity : AppCompatActivity() {
             tvDescription.text = text
 
             taskModel?.description = text
+            val fbOp = FirebaseDatabaseOperations()
+            fbOp.updateTask(taskModel!!)
+        }
+
+        // Create and show the dialog
+        val dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun showRenameDialog() {
+        val builder = AlertDialog.Builder(this)
+
+        // Set the title and message of the dialog
+        builder.setTitle("Rename Task")
+        //        builder.setMessage("Please enter some text")
+
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(20, 20, 20, 20) // Set padding for the layout
+
+        // Create an EditText view
+        val input1 = AppCompatEditText(this)
+//        input1.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.rext_orange_border))
+        input1.inputType = InputType.TYPE_CLASS_TEXT
+        input1.hint = "Please Enter name"
+        input1.setText(taskModel?.name)
+
+
+        layout.addView(input1)
+
+        // Add the EditText view to the dialog
+        builder.setView(layout)
+
+        // Set a positive button on the dialog
+        builder.setPositiveButton("OK") { dialog, which ->
+            // Get the user's input and do something with it
+            val text = input1.text.toString()
+            tvTaskName.text = text
+
+            taskModel?.name = text
             val fbOp = FirebaseDatabaseOperations()
             fbOp.updateTask(taskModel!!)
         }
@@ -528,7 +603,8 @@ class TaskDetailActivity : AppCompatActivity() {
                     taskModel?.progress = totalProgress.toString()
                     fb.updateTask(taskModel!!)
                     tvProgress.text = totalProgress.toString()
-                    progressBar.progress = totalProgress
+//                    progressBar.progress = totalProgress
+                    progressBar.updateProgress(totalProgress, this@TaskDetailActivity)
             }
         }
         /*fb.addOnDataChangedListener(object : FirebaseDatabaseOperations.DataChangedListener {

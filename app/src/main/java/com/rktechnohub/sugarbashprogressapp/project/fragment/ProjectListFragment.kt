@@ -23,6 +23,7 @@ import com.rktechnohub.sugarbashprogressapp.authentication.model.SessionManager
 import com.rktechnohub.sugarbashprogressapp.firebasedb.FirebaseDatabaseOperations
 import com.rktechnohub.sugarbashprogressapp.map.activity.MapEditActivity
 import com.rktechnohub.sugarbashprogressapp.project.activity.AddProjectActivity
+import com.rktechnohub.sugarbashprogressapp.project.activity.EditEmojiActivity
 import com.rktechnohub.sugarbashprogressapp.project.activity.ProjectDetailActivity
 import com.rktechnohub.sugarbashprogressapp.project.adapter.ProjectAdapter
 import com.rktechnohub.sugarbashprogressapp.project.interfaces.ItemMoveCallback
@@ -45,18 +46,20 @@ import kotlinx.coroutines.withContext
  * create an instance of this fragment.
  */
 class ProjectListFragment : Fragment() {
+    private val ARG_MAPLE = "is_maple"
     private var view: View? = null
     private lateinit var rvProjects: RecyclerView
     private var projectViewModel: ProjectViewModel? = null
 
     private lateinit var fabAdd: FloatingActionButton
+    private var isMaple = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }*/
+        arguments?.let {
+            isMaple = it.getBoolean(ARG_MAPLE)
+        }
     }
 
     override fun onCreateView(
@@ -119,6 +122,19 @@ class ProjectListFragment : Fragment() {
                     showDeleteItemDialog(project, pos)
                 }
 
+                override fun onItemCopy(project: Project, pos: Int) {
+                    showCopyItemDialog(project, pos)
+                }
+
+                override fun onIconClicked(project: Project, pos: Int) {
+                    val intent = Intent(requireContext(), EditEmojiActivity::class.java)
+                    val bundle = Bundle()
+                    bundle.putParcelable("data", project)
+                    bundle.putBoolean("isp", true)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                }
+
                 override fun onDragged(list: List<Project>) {
                     getOrderList(list, SessionManager(requireContext()))
                 }
@@ -135,7 +151,7 @@ class ProjectListFragment : Fragment() {
                 AppUtils.roleAdmin -> isDelete = true
                 else -> false
             }
-            (rvProjects.adapter as ProjectAdapter).setData(items, reqManager, isDelete)
+            (rvProjects.adapter as ProjectAdapter).setData(items, reqManager, isDelete, requireContext())
         })
     }
 
@@ -161,8 +177,43 @@ class ProjectListFragment : Fragment() {
             lifecycleScope.launch {
                 val fb = FirebaseDatabaseOperations()
                 fb.deleteProject(project){
-                    (rvProjects.adapter!! as TasksAdapter).removeItem(position)
+                    (rvProjects.adapter!! as ProjectAdapter).removeItem(position)
                 }
+            }
+
+        }
+
+        alertDialog.setNegativeButton("Cancel") { _, _ ->
+            // Cancel the deletion
+        }
+
+        alertDialog.show()
+    }
+
+    fun showCopyItemDialog(project: Project, position: Int) {
+        val alertDialog = AlertDialog.Builder(requireContext())
+
+        alertDialog.setTitle("Copy Project")
+        alertDialog.setMessage("Are you sure you want to copy this project?")
+
+        alertDialog.setPositiveButton("Copy") { _, _ ->
+            // Delete the item here
+
+            /*fb.addOnDeleteDataListener(object: FirebaseDatabaseOperations.DeleteDataListener{
+                override fun success() {
+                    (rvTasks.adapter!! as TasksAdapter).removeItem(position)
+                }
+
+                override fun failed() {
+                    Toast.makeText(requireContext(), "Please try again", Toast.LENGTH_SHORT).show()
+                }
+
+            })*/
+            val session = SessionManager(requireContext())
+            lifecycleScope.launch {
+                val fb = FirebaseDatabaseOperations()
+                val project = fb.copyProject(project, session.getOrderListTask().toMutableList())
+                onResume()
             }
 
         }
@@ -184,7 +235,11 @@ class ProjectListFragment : Fragment() {
             val list: MutableList<Project> = mutableListOf()
             when (session.getRole()) {
                 AppUtils.roleSuperAdmin.toString() -> {
-                    list.addAll(fbOp.getAllProjectsForSuperAdminCoroutine(session.getOrderList()))
+                    if (isMaple){
+                        list.addAll(fbOp.getAllProjectsForAdminCoroutine(session.getUId(), session.getOrderList()))
+                    } else {
+                        list.addAll(fbOp.getAllProjectsForSuperAdminCoroutine(session.getOrderList()))
+                    }
                 }
 
                 AppUtils.roleAdmin.toString() -> {
@@ -236,12 +291,11 @@ class ProjectListFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(isMaple: Boolean) =
             ProjectListFragment().apply {
-                /*arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }*/
+                arguments = Bundle().apply {
+                    putBoolean(ARG_MAPLE, isMaple)
+                }
             }
     }
 }

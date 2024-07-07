@@ -12,9 +12,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatButton
@@ -27,12 +29,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.rktechnohub.sugarbashprogressapp.R
+import com.rktechnohub.sugarbashprogressapp.authentication.model.SessionManager
 import com.rktechnohub.sugarbashprogressapp.firebasedb.FirebaseDatabaseOperations
 import com.rktechnohub.sugarbashprogressapp.map.models.DrawingImageView
 import com.rktechnohub.sugarbashprogressapp.project.model.Project
+import com.rktechnohub.sugarbashprogressapp.task.adapter.TasksAdapter
 import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MapEditActivity : AppCompatActivity() {
     private val REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 2
@@ -48,11 +54,14 @@ class MapEditActivity : AppCompatActivity() {
 
     private lateinit var ivUndo: AppCompatImageView
     private lateinit var ivDone: AppCompatImageView
+    private lateinit var ivDelete: AppCompatImageView
+    private lateinit var progressBar: ProgressBar
 
     private var projectModel: Project? = null
     private lateinit var btnUploadMap: AppCompatButton
 
     private var isImage = false
+    private var oldBitmap: Bitmap? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +95,8 @@ class MapEditActivity : AppCompatActivity() {
         if (intent != null && intent.extras != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 projectModel = intent.extras!!.getParcelable("data", Project::class.java)
+            } else {
+                projectModel = intent.extras!!.getParcelable("data")
             }
         }
     }
@@ -100,9 +111,19 @@ class MapEditActivity : AppCompatActivity() {
         ivCircle = findViewById(R.id.iv_circle)
         ivRectangle = findViewById(R.id.iv_rect)
         ivDone = findViewById(R.id.iv_done)
+        ivDelete = findViewById(R.id.iv_delete)
         btnUploadMap = findViewById(R.id.btn_upload)
+        progressBar = findViewById(R.id.progress_bar)
 
         ivMap = findViewById(R.id.iv_draw)
+
+        val session = SessionManager(this)
+        if (session.getRole() == AppUtils.roleAdmin.toString() ||
+            session.getRole() == AppUtils.roleSuperAdmin.toString()){
+            ivDelete.visibility = View.VISIBLE
+        } else {
+            ivDelete.visibility = View.GONE
+        }
     }
 
     private fun init(){
@@ -110,7 +131,7 @@ class MapEditActivity : AppCompatActivity() {
 
         } else {
             isImage = true
-            btnUploadMap.visibility = View.GONE
+            showUpload(View.GONE)
             Glide.with(this)
                 .load(projectModel?.mapLink)
                 .skipMemoryCache(true)
@@ -170,6 +191,10 @@ class MapEditActivity : AppCompatActivity() {
             ivMap.undo()
         }
 
+        ivDelete.setOnClickListener {
+            showDeleteDialog()
+        }
+
         btnUploadMap.setOnClickListener {
             getImageFromGallery()
         }
@@ -177,13 +202,69 @@ class MapEditActivity : AppCompatActivity() {
         ivDone.setOnClickListener {
             val bitmap = ivMap.saveAsBitmap()
             val fb = FirebaseDatabaseOperations()
+            progressBar.visibility = View.VISIBLE
             lifecycleScope.launch {
+                /*if (projectModel?.mapLink != null){
+                    fb.deleteImageFromFirebaseStorage(projectModel?.mapLink!!)
+                }*/
+
+                if (oldBitmap != null) {
+                    val oldUrl = fb.uploadBitmapToFirebaseStorage(oldBitmap!!)
+                    projectModel?.oldMapLink = oldUrl.toString()
+                }
                 val url = fb.uploadBitmapToFirebaseStorage(bitmap)
                 projectModel?.mapLink = url.toString()
                 fb.updateProject(projectModel!!)
                 finish()
+                withContext(Dispatchers.Main){
+                    progressBar.visibility = View.GONE
+                }
             }
         }
+    }
+
+    fun showDeleteDialog() {
+        val alertDialog = AlertDialog.Builder(this)
+
+        alertDialog.setTitle("Clear Map")
+        alertDialog.setMessage("Are you sure you want to clear the whole map?")
+
+        alertDialog.setPositiveButton("Clear") { _, _ ->
+            // Delete the item here
+
+            /*fb.addOnDeleteDataListener(object: FirebaseDatabaseOperations.DeleteDataListener{
+                override fun success() {
+                    (rvTasks.adapter!! as TasksAdapter).removeItem(position)
+                }
+
+                override fun failed() {
+                    Toast.makeText(requireContext(), "Please try again", Toast.LENGTH_SHORT).show()
+                }
+
+            })*/
+            progressBar.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                val fb = FirebaseDatabaseOperations()
+                projectModel?.mapLink = projectModel?.oldMapLink!!
+                fb.updateProject(projectModel!!)
+                withContext(Dispatchers.Main){
+                    progressBar.visibility = View.GONE
+                    Glide.with(this@MapEditActivity)
+                        .load(projectModel?.mapLink)
+                        .skipMemoryCache(true)
+                        .into(ivMap)
+                        .onLoadFailed(AppCompatResources.getDrawable(
+                            this@MapEditActivity, R.drawable.ic_forest))
+                }
+            }
+
+        }
+
+        alertDialog.setNegativeButton("Cancel") { _, _ ->
+            // Cancel the deletion
+        }
+
+        alertDialog.show()
     }
 
     private fun unselectAllViews(){
@@ -207,7 +288,7 @@ class MapEditActivity : AppCompatActivity() {
         } else {
             // We already have permission, so we can get the image
             if (!isImage){
-                btnUploadMap.visibility = View.VISIBLE
+                showUpload(View.VISIBLE)
             }
         }
     }
@@ -219,7 +300,7 @@ class MapEditActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // We got permission, so we can get the image
                     if (!isImage){
-                        btnUploadMap.visibility = View.VISIBLE
+                        showUpload(View.VISIBLE)
                     }
                 } else {
                     // We didn't get permission, so we can't get the image
@@ -244,8 +325,19 @@ class MapEditActivity : AppCompatActivity() {
             } else {
                 MediaStore.Images.Media.getBitmap(contentResolver, uri)
             }
+            oldBitmap = bitmap
             ivMap.setImageBitmap(bitmap)
             isImage = false
+        }
+    }
+
+    private fun showUpload(isVisible: Int){
+        val session = SessionManager(this)
+        if (session.getRole() == AppUtils.roleAdmin.toString() ||
+            session.getRole() == AppUtils.roleSuperAdmin.toString()){
+            btnUploadMap.visibility = isVisible
+        } else {
+            btnUploadMap.visibility = View.GONE
         }
     }
 }

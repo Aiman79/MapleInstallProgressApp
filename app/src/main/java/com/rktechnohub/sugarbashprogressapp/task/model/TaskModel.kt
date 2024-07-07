@@ -20,6 +20,7 @@ class TaskModel : Parcelable{
     var progress: String
     var deadline_date: String
     var deadline_time: String
+    var subTaskList: MutableList<TaskModel>
 
     init {
         this.id = ""
@@ -34,6 +35,7 @@ class TaskModel : Parcelable{
         this.progress = ""
         this.deadline_date = ""
         this.deadline_time = ""
+        this.subTaskList = mutableListOf()
     }
 
     constructor(){

@@ -19,4 +19,12 @@
         </shape>
         </scale>
     </item>
+    <item android:id="@android:id/secondaryProgress">
+        <clip>
+            <shape>
+                <corners android:radius="4dp" />
+                <solid android:color="#cccccc" />
+            </shape>
+        </clip>
+    </item>
 </layer-list>

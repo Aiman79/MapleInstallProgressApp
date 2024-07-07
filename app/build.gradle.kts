@@ -92,4 +92,7 @@ dependencies {
 
     //gson
     implementation("com.google.code.gson:gson:2.8.6")
+
+    //color
+    implementation("com.github.QuadFlask:colorpicker:0.0.15")
 }

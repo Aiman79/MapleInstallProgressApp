@@ -33,8 +33,18 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_email"
+        android:id="@+id/tv_role"
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="@dimen/small_text"
+        android:textColor="@color/black"
+        android:text="User"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_email"
+        app:layout_constraintTop_toBottomOf="@+id/tv_role"
         app:layout_constraintStart_toStartOf="parent"
         android:textSize="@dimen/medium_text"
         android:textColor="@color/colorAccent"

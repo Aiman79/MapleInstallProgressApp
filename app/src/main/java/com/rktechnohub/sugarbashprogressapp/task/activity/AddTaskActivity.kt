@@ -71,6 +71,9 @@ class AddTaskActivity : AppCompatActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 projectModel = intent.extras!!.getParcelable("data", Project::class.java)
                 taskModel = intent.extras!!.getParcelable("data_task", TaskModel::class.java)
+            } else {
+                projectModel = intent.extras!!.getParcelable("data")
+                taskModel = intent.extras!!.getParcelable("data_task")
             }
         }
     }

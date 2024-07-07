@@ -1,11 +1,13 @@
 package com.rktechnohub.sugarbashprogressapp.project.activity
 
+import android.animation.ObjectAnimator
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -20,11 +22,13 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.marginLeft
 import androidx.core.view.setPadding
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -49,6 +53,7 @@ import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModel
 import com.rktechnohub.sugarbashprogressapp.task.viewmodel.TaskViewModelFactory
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import com.rktechnohub.sugarbashprogressapp.utils.ColorCustomizeClass.updateProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -70,9 +75,17 @@ class ProjectDetailActivity : AppCompatActivity() {
     private lateinit var rvTasks: RecyclerView
     private lateinit var tvNoTasks: AppCompatTextView
     private lateinit var ivAssign: AppCompatImageView
+    private lateinit var ivEdit: AppCompatImageView
+    private lateinit var nestedScrollView: NestedScrollView
+    private lateinit var tvTotalTasks: AppCompatTextView
+    private lateinit var clTotalTask: ConstraintLayout
 
     private var taskViewModel: TaskViewModel? = null
     private var role = ""
+
+    private var totalTasks = 0
+    private var completedTasks = 0
+//    private var progress = 0
 
     var list: MutableList<TaskModel> = mutableListOf()
 //    private var totalTasks = 0
@@ -97,6 +110,8 @@ class ProjectDetailActivity : AppCompatActivity() {
         if (intent != null && intent.extras != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 projectModel = intent.extras!!.getParcelable("data", Project::class.java)
+            } else {
+                projectModel = intent.extras!!.getParcelable("data")!!
             }
         }
     }
@@ -106,6 +121,7 @@ class ProjectDetailActivity : AppCompatActivity() {
         tvTitle = toolBar.findViewById(R.id.tv_title)
         ivBack = toolBar.findViewById(R.id.iv_back)
         ivAssign = toolBar.findViewById(R.id.iv_assign)
+        ivEdit = toolBar.findViewById(R.id.iv_edit)
         progressBar = findViewById(R.id.progress_bar)
         tvProgress = findViewById(R.id.tv_progress)
         tvStartDate = findViewById(R.id.tv_start_date)
@@ -116,6 +132,9 @@ class ProjectDetailActivity : AppCompatActivity() {
         btnAddTask = findViewById(R.id.btn_add_task)
         tvNoTasks = findViewById(R.id.tv_no_tasks)
         rvTasks = findViewById(R.id.rv_tasks)
+        nestedScrollView = findViewById(R.id.nested_scrollview)
+        tvTotalTasks = findViewById(R.id.tv_completed_task)
+        clTotalTask = findViewById(R.id.cl_total_tasks)
 
         val session = SessionManager(this)
         role = session.getRole()
@@ -157,7 +176,13 @@ class ProjectDetailActivity : AppCompatActivity() {
             if (projectModel != null) {
                 tvTitle.text = projectModel?.name
                 if (projectModel?.progress != null) {
-                    progressBar.progress = projectModel?.progress?.toInt()!!
+                    //animator
+                    val animator = ObjectAnimator.ofInt(progressBar, "progress",
+                        0, projectModel?.progress?.toInt()!!)
+                    animator.duration = 500 // 2 seconds
+                    animator.start()
+//                    progressBar.progress = projectModel?.progress?.toInt()!!
+                    progressBar.updateProgress(projectModel?.progress?.toInt()!!, this)
                     tvProgress.text = projectModel?.progress
                 }
                 tvStartDate.text = projectModel?.startDate
@@ -198,7 +223,19 @@ class ProjectDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        ivBack.setOnClickListener { finish() }
+        ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        ivEdit.setOnClickListener {
+            showRenameDialog()
+        }
+
+        nestedScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (scrollY > oldScrollY) { // scrolling down
+                animateButton(false) // hide text
+            } else if (scrollY < oldScrollY) { // scrolling up
+                animateButton(true) // show text
+            }
+        }
     }
 
     private fun setUpRecyclerView(){
@@ -234,15 +271,31 @@ class ProjectDetailActivity : AppCompatActivity() {
         // Observe changes to the ViewModel's items LiveData
         taskViewModel?.items?.observe(this, Observer { items ->
             if(items.isEmpty()){
-                rvTasks.visibility = View.GONE
+                clTotalTask.visibility = View.GONE
                 tvNoTasks.visibility = View.VISIBLE
             } else {
-                rvTasks.visibility = View.VISIBLE
+                clTotalTask.visibility = View.VISIBLE
                 tvNoTasks.visibility = View.GONE
 //                totalTasks = items.size
-                (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this))
+                showTotalTasks(items)
+                (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this), this)
             }
         })
+    }
+
+    fun showTotalTasks(items: MutableList<TaskModel>){
+        completedTasks = 0
+        totalTasks = 0
+        for (task in items){
+            if(task.progress.isNotEmpty()){
+                if (task.progress == "100") {
+                    completedTasks++
+                }
+            }
+        }
+        totalTasks = items.size
+        (rvTasks.adapter!! as TasksAdapter).setData(items, Glide.with(this), this)
+        tvTotalTasks.text = "$completedTasks of $totalTasks"
     }
 
     fun getOrderList(list: List<TaskModel>, session: SessionManager){
@@ -304,6 +357,7 @@ class ProjectDetailActivity : AppCompatActivity() {
 //        input1.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.rext_orange_border))
         input1.inputType = InputType.TYPE_CLASS_TEXT
         input1.hint = "Please Enter description"
+        input1.setText(projectModel?.description)
 
 
         layout.addView(input1)
@@ -318,6 +372,45 @@ class ProjectDetailActivity : AppCompatActivity() {
             tvDescription.text = text
 
             projectModel?.description = text
+            val fbOp = FirebaseDatabaseOperations()
+            fbOp.updateProject(projectModel!!)
+        }
+
+        // Create and show the dialog
+        val dialog = builder.create()
+        dialog.show()
+    }
+    private fun showRenameDialog() {
+        val builder = AlertDialog.Builder(this)
+
+        // Set the title and message of the dialog
+        builder.setTitle("Rename Project")
+        //        builder.setMessage("Please enter some text")
+
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(20, 20, 20, 20) // Set padding for the layout
+
+        // Create an EditText view
+        val input1 = AppCompatEditText(this)
+//        input1.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.rext_orange_border))
+        input1.inputType = InputType.TYPE_CLASS_TEXT
+        input1.hint = "Please Enter name"
+        input1.setText(projectModel?.name)
+
+
+        layout.addView(input1)
+
+        // Add the EditText view to the dialog
+        builder.setView(layout)
+
+        // Set a positive button on the dialog
+        builder.setPositiveButton("OK") { dialog, which ->
+            // Get the user's input and do something with it
+            val text = input1.text.toString()
+            tvTitle.text = text
+
+            projectModel?.name = text
             val fbOp = FirebaseDatabaseOperations()
             fbOp.updateProject(projectModel!!)
         }
@@ -401,6 +494,7 @@ class ProjectDetailActivity : AppCompatActivity() {
                 }
 
                 projectModel?.id = proj?.id!!
+                projectModel?.taskId = proj.taskId
                 courotinCalculateProgress()
             }
         } catch (e: Exception){
@@ -443,7 +537,8 @@ class ProjectDetailActivity : AppCompatActivity() {
                     projectModel?.progress = totalProgress.toString()
                     fb.updateProject(projectModel!!)
                     tvProgress.text = totalProgress.toString()
-                    progressBar.progress = totalProgress
+//                    progressBar.progress = totalProgress
+                    progressBar.updateProgress(totalProgress, this@ProjectDetailActivity)
                 }
             }
 
@@ -476,8 +571,25 @@ class ProjectDetailActivity : AppCompatActivity() {
             }
             withContext(Dispatchers.Main) {
                 tvProgress.text = totalProgress.toString()
-                progressBar.progress = totalProgress
+//                progressBar.progress = totalProgress
+                progressBar.updateProgress(totalProgress, this@ProjectDetailActivity)
             }
         }
+    }
+
+    private fun animateButton(showText: Boolean) {
+        btnAddTask.animate()
+            .setDuration(200) // animation duration
+            .scaleX(if (showText) 1f else 0.9f) // adjust the scale to show/hide text
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .withEndAction {
+                if (!showText) {
+                    btnAddTask.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_vector_add_white, 0, 0, 0)
+                    btnAddTask.text = ""
+                } else {
+                    btnAddTask.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_vector_add_white, 0, 0, 0)
+                    btnAddTask.text = resources.getString(R.string.add_new_task)
+                }
+            }
     }
 }

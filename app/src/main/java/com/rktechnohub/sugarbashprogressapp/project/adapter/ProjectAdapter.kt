@@ -1,5 +1,6 @@
 package com.rktechnohub.sugarbashprogressapp.project.adapter
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -15,6 +16,7 @@ import com.rktechnohub.sugarbashprogressapp.project.fragment.ProjectListFragment
 import com.rktechnohub.sugarbashprogressapp.project.model.Project
 import com.rktechnohub.sugarbashprogressapp.task.model.TaskModel
 import com.rktechnohub.sugarbashprogressapp.utils.AppUtils
+import com.rktechnohub.sugarbashprogressapp.utils.ColorCustomizeClass.updateProgress
 
 /**
  * Created by Aiman on 18, May, 2024
@@ -24,12 +26,14 @@ class ProjectAdapter(private var mList: MutableList<Project>
     //    private var mList = mutableListOf<ProjectModel>()
     private var requestManager: RequestManager? = null
     private var isDelete = false
+    var context: Context? = null
 
-    fun setData(list: List<Project>, requestManager: RequestManager, isDelete: Boolean) {
+    fun setData(list: List<Project>, requestManager: RequestManager, isDelete: Boolean, context: Context) {
         mList.addAll(list)
         this.requestManager = requestManager
         Log.d("ProjectAdapter", "setData called with list of size ${list.size}")
         this.isDelete = isDelete
+        this.context = context
 
         this.notifyDataSetChanged()
     }
@@ -47,7 +51,8 @@ class ProjectAdapter(private var mList: MutableList<Project>
         holder.tvName.text = mList[position].name
         holder.tvDate.text = "${mList[position].startDate} - ${mList[position].endDate}"
         holder.tvProgress.text = "${mList[position].progress}%"
-        holder.progressBar.progress = mList[position].progress.toInt()
+//        holder.progressBar.progress = mList[position].progress.toInt()
+        holder.progressBar.updateProgress(mList[position].progress.toInt(), context!!)
 
         if (isDelete){
             holder.ivDelete.visibility = View.VISIBLE
@@ -68,6 +73,14 @@ class ProjectAdapter(private var mList: MutableList<Project>
                 ?.into(holder.ivIcon)
         }
 
+        holder.ivIcon.setOnClickListener {
+            onItemClickedListener?.onIconClicked(mList[position], position)
+        }
+
+        holder.tvIcon.setOnClickListener {
+            onItemClickedListener?.onIconClicked(mList[position], position)
+        }
+
         holder.ivMap.setOnClickListener {
             onItemClickedListener?.onMapClicked(mList[position])
         }
@@ -80,6 +93,10 @@ class ProjectAdapter(private var mList: MutableList<Project>
             onItemClickedListener?.onItemDelete(mList[position], position)
         }
 
+        holder.ivCopy.setOnClickListener {
+            onItemClickedListener?.onItemCopy(mList[position], position)
+        }
+
 
     }
 
@@ -89,10 +106,17 @@ class ProjectAdapter(private var mList: MutableList<Project>
         this.onItemClickedListener = onItemClickedListener
     }
 
+    fun removeItem(position: Int){
+        mList.removeAt(position)
+        notifyDataSetChanged()
+    }
+
     interface OnItemClickedListener {
         fun onItemClicked(project: Project)
         fun onMapClicked(project: Project)
         fun onItemDelete(project: Project, pos: Int)
+        fun onItemCopy(project: Project, pos: Int)
+        fun onIconClicked(project: Project, pos: Int)
         fun onDragged(list: List<Project>)
     }
 

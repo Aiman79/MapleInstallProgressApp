@@ -37,7 +37,8 @@
     <color name="flipkart_blue">#286FE8</color>
     <color name="flipkart_yellow">#F2D52D</color>
 
-    <color name="blue_30">#8F1A237E</color>
+    <color name="blue_30">#701A237E</color>
     <color name="color_green_light">#8F105E21</color>
-    <color name="color_red_light">#8FE53935</color>
+    <color name="color_green_extra_light">#59105E21</color>
+    <color name="color_red_light">#6FE53935</color>
 </resources>
